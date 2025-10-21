@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/utils/constants.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/text_styles.dart';
-import '../../core/routes/app_routes.dart';
-import 'widgets/menu_card.dart';
+import '../../../core/utils/constants.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/text_styles.dart';
+import '../../../core/routes/app_routes.dart';
+import '../widgets/menu_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -73,38 +73,10 @@ class HomePage extends StatelessWidget {
             ),
             
             const SizedBox(height: 32),
-            
-            // Información del sistema
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Información del Sistema', style: TextStyles.headline3),
-                    const SizedBox(height: 8),
-                    _buildInfoRow('Versión', '1.0.0'),
-                    _buildInfoRow('Desarrollado por', 'Fernando Fleitas'),
-                    _buildInfoRow('Fecha', 'Octubre 2025'),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
   
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text('$label: ', style: TextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
-          Text(value, style: TextStyles.bodyMedium),
-        ],
-      ),
-    );
-  }
 }

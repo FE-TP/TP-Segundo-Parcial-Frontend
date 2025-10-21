@@ -4,8 +4,20 @@ import 'package:provider/provider.dart';
 // Importar proveedores
 import 'modules/vehiculos/providers/vehiculo_provider.dart';
 
+// Importar modelos
+import 'modules/vehiculos/models/vehiculo_model.dart';
+
 // Importar páginas
-import 'modules/vehiculos/pages/vehiculos_list_page_new.dart';
+import 'modules/vehiculos/pages/vehiculos_list_page.dart';
+import 'modules/vehiculos/pages/vehiculo_form_page.dart';
+import 'modules/home/pages/home_page.dart';
+import 'modules/clientes/pages/clientes_list_page.dart';
+import 'modules/reservas/pages/reservas_list_page.dart';
+import 'modules/entregas/pages/entregas_list_page.dart';
+import 'modules/estadisticas/pages/estadisticas_page.dart';
+
+// Importar rutas
+import 'core/routes/app_routes.dart';
 
 /// Clase principal de la aplicación
 class App extends StatelessWidget {
@@ -16,6 +28,7 @@ class App extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => VehiculoProvider()),
+        // Aquí se pueden agregar más providers a medida que se desarrollen los otros módulos
       ],
       child: MaterialApp(
         title: 'Sistema de Alquiler de Autos',
@@ -26,8 +39,24 @@ class App extends StatelessWidget {
             foregroundColor: Colors.white,
           ),
         ),
-        // Iniciar directamente en la página de vehículos
-        home: const VehiculosListPage(),
+        initialRoute: AppRoutes.home,
+        routes: {
+          AppRoutes.home: (context) => const HomePage(),
+          AppRoutes.vehiculos: (context) => const VehiculosListPage(),
+          AppRoutes.clientes: (context) => const ClientesListPage(),
+          AppRoutes.reservas: (context) => const ReservasListPage(),
+          AppRoutes.entregas: (context) => const EntregasListPage(),
+          AppRoutes.estadisticas: (context) => const EstadisticasPage(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == AppRoutes.vehiculoForm) {
+            final vehiculo = settings.arguments as Vehiculo?;
+            return MaterialPageRoute(
+              builder: (context) => VehiculoFormPage(vehiculo: vehiculo),
+            );
+          }
+          return null;
+        },
       ),
     );
   }

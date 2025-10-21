@@ -19,20 +19,24 @@ class _VehiculoFormPageState extends State<VehiculoFormPage> {
   final _anioController = TextEditingController();
   bool _disponible = true;
   bool _isEditing = false;
-  int? _vehiculoId;
+  late int _vehiculoId;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final vehiculo = ModalRoute.of(context)?.settings.arguments as Vehiculo?;
-    
-    if (vehiculo != null && !_isEditing) {
-      _marcaController.text = vehiculo.marca;
-      _modeloController.text = vehiculo.modelo;
-      _anioController.text = vehiculo.anio.toString();
-      _disponible = vehiculo.disponible;
-      _vehiculoId = vehiculo.idVehiculo;
+  void initState() {
+    super.initState();
+    _loadVehiculoData();
+  }
+
+  void _loadVehiculoData() {
+    if (widget.vehiculo != null) {
       _isEditing = true;
+      _vehiculoId = widget.vehiculo!.idVehiculo;
+      _marcaController.text = widget.vehiculo!.marca;
+      _modeloController.text = widget.vehiculo!.modelo;
+      _anioController.text = widget.vehiculo!.anio.toString();
+      _disponible = widget.vehiculo!.disponible;
+    } else {
+      _vehiculoId = 0; // Se asignará al guardar
     }
   }
 
@@ -44,52 +48,11 @@ class _VehiculoFormPageState extends State<VehiculoFormPage> {
     super.dispose();
   }
 
-  void _guardar() {
-    if (_formKey.currentState!.validate()) {
-      final vehiculoProvider = Provider.of<VehiculoProvider>(context, listen: false);
-      final anio = int.parse(_anioController.text);
-      
-      if (_isEditing && _vehiculoId != null) {
-        // Actualizar vehículo existente
-        final vehiculoActualizado = Vehiculo(
-          idVehiculo: _vehiculoId!,
-          marca: _marcaController.text,
-          modelo: _modeloController.text,
-          anio: anio,
-          disponible: _disponible,
-        );
-        
-        vehiculoProvider.actualizar(vehiculoActualizado);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vehículo actualizado correctamente')),
-        );
-      } else {
-        // Crear nuevo vehículo
-        final nuevoVehiculo = Vehiculo(
-          idVehiculo: vehiculoProvider.nextId,
-          marca: _marcaController.text,
-          modelo: _modeloController.text,
-          anio: anio,
-          disponible: _disponible,
-        );
-        
-        vehiculoProvider.agregar(nuevoVehiculo);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vehículo agregado correctamente')),
-        );
-      }
-      
-      Navigator.pop(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentYear = DateTime.now().year;
-    
     return Scaffold(
-      appBar: CustomAppBar(
-        title: _isEditing ? Constants.editarVehiculo : Constants.agregarVehiculo,
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Editar Vehículo' : 'Agregar Vehículo'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -98,46 +61,73 @@ class _VehiculoFormPageState extends State<VehiculoFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Campo Marca
-              CustomTextField(
-                labelText: Constants.marcaLabel,
+              TextFormField(
                 controller: _marcaController,
+                decoration: const InputDecoration(
+                  labelText: 'Marca',
+                  border: OutlineInputBorder(),
+                ),
                 textCapitalization: TextCapitalization.words,
-                validator: (value) => Validators.combine([
-                  Validators.required,
-                  (value) => Validators.minLength(value, 2),
-                ], value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingrese la marca';
+                  }
+                  if (value.length < 2) {
+                    return 'La marca debe tener al menos 2 caracteres';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               
-              // Campo Modelo
-              CustomTextField(
-                labelText: Constants.modeloLabel,
+              TextFormField(
                 controller: _modeloController,
+                decoration: const InputDecoration(
+                  labelText: 'Modelo',
+                  border: OutlineInputBorder(),
+                ),
                 textCapitalization: TextCapitalization.words,
-                validator: (value) => Validators.combine([
-                  Validators.required,
-                  (value) => Validators.minLength(value, 2),
-                ], value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingrese el modelo';
+                  }
+                  if (value.length < 2) {
+                    return 'El modelo debe tener al menos 2 caracteres';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               
-              // Campo Año
-              CustomTextField(
-                labelText: Constants.anioLabel,
+              TextFormField(
                 controller: _anioController,
+                decoration: const InputDecoration(
+                  labelText: 'Año',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.combine([
-                  Validators.required,
-                  Validators.onlyNumbers,
-                  (value) => Validators.yearRange(value, minYear: 1900, maxYear: currentYear + 1),
-                ], value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingrese el año';
+                  }
+                  
+                  final year = int.tryParse(value);
+                  if (year == null) {
+                    return 'El año debe ser un número';
+                  }
+                  
+                  final currentYear = DateTime.now().year;
+                  if (year < 1900 || year > currentYear + 1) {
+                    return 'El año debe estar entre 1900 y ${currentYear + 1}';
+                  }
+                  
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               
-              // Campo Disponible
               SwitchListTile(
-                title: const Text(Constants.disponibleLabel),
+                title: const Text('Disponible'),
                 value: _disponible,
                 onChanged: (value) {
                   setState(() {
@@ -147,28 +137,53 @@ class _VehiculoFormPageState extends State<VehiculoFormPage> {
               ),
               const SizedBox(height: 24),
               
-              // Botones
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CustomButton(
-                    text: Constants.cancelar,
-                    onPressed: () => Navigator.pop(context),
-                    type: CustomButtonType.outline,
-                  ),
-                  const SizedBox(width: 16),
-                  CustomButton(
-                    text: Constants.guardar,
-                    onPressed: _guardar,
-                    type: CustomButtonType.primary,
-                    icon: Icons.save,
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: _saveVehiculo,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(
+                  _isEditing ? 'ACTUALIZAR' : 'GUARDAR',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+  
+  void _saveVehiculo() {
+    if (_formKey.currentState!.validate()) {
+      final vehiculoProvider = Provider.of<VehiculoProvider>(context, listen: false);
+      
+      final vehiculo = Vehiculo(
+        idVehiculo: _isEditing ? _vehiculoId : vehiculoProvider.nextId,
+        marca: _marcaController.text,
+        modelo: _modeloController.text,
+        anio: int.parse(_anioController.text),
+        disponible: _disponible,
+      );
+      
+      if (_isEditing) {
+        vehiculoProvider.actualizar(vehiculo);
+      } else {
+        vehiculoProvider.agregar(vehiculo);
+      }
+      
+      Navigator.pop(context);
+      
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_isEditing 
+            ? 'Vehículo actualizado correctamente' 
+            : 'Vehículo agregado correctamente'
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 }
