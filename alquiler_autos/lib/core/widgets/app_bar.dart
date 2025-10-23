@@ -5,11 +5,10 @@ class CustomAppBar extends AppBar {
   CustomAppBar({
     super.key,
     required String title,
-    List<Widget>? actions,
+    super.actions,
   }) : super(
           title: Text(title),
           centerTitle: true,
-          actions: actions,
           elevation: 2,
         );
 }

@@ -13,7 +13,7 @@ class Entrega {
     this.observaciones,
     this.kilometrajeFinal,
   });
-  
+
   /// Crea una copia de la entrega con valores actualizados
   Entrega copyWith({
     DateTime? fechaEntrega,
@@ -21,14 +21,14 @@ class Entrega {
     int? kilometrajeFinal,
   }) {
     return Entrega(
-      idEntrega: this.idEntrega,
-      idReserva: this.idReserva,
+      idEntrega: idEntrega,
+      idReserva: idReserva,
       fechaEntrega: fechaEntrega ?? this.fechaEntrega,
       observaciones: observaciones ?? this.observaciones,
       kilometrajeFinal: kilometrajeFinal ?? this.kilometrajeFinal,
     );
   }
-  
+
   /// Convierte la entrega a un mapa para serialización
   Map<String, dynamic> toMap() {
     return {
@@ -39,7 +39,7 @@ class Entrega {
       'kilometrajeFinal': kilometrajeFinal,
     };
   }
-  
+
   /// Crea una entrega desde un mapa (deserialización)
   factory Entrega.fromMap(Map<String, dynamic> map) {
     return Entrega(

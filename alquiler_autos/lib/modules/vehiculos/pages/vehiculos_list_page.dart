@@ -14,14 +14,11 @@ class VehiculosListPage extends StatefulWidget {
 class _VehiculosListPageState extends State<VehiculosListPage> {
   String _searchQuery = '';
   bool _showOnlyAvailable = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vehículos'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Vehículos'), centerTitle: true),
       body: Column(
         children: [
           _buildFilterSection(),
@@ -39,18 +36,23 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
               builder: (context, provider, child) {
                 final vehiculos = _getFilteredVehiculos(provider);
                 final totalVehiculos = provider.vehiculos.length;
-                
-                if (vehiculos.isEmpty && (_searchQuery.isNotEmpty || _showOnlyAvailable)) {
+
+                if (vehiculos.isEmpty &&
+                    (_searchQuery.isNotEmpty || _showOnlyAvailable)) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.search_off, size: 48, color: Colors.grey),
+                        const Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           _showOnlyAvailable && _searchQuery.isEmpty
-                            ? 'No hay vehículos disponibles en este momento'
-                            : 'No se encontraron vehículos que coincidan con los filtros',
+                              ? 'No hay vehículos disponibles en este momento'
+                              : 'No se encontraron vehículos que coincidan con los filtros',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
@@ -85,15 +87,14 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
                     child: Text('No hay vehículos disponibles'),
                   );
                 }
-                
+
                 return Column(
                   children: [
                     if (_searchQuery.isNotEmpty || _showOnlyAvailable)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
-                          'Mostrando ${vehiculos.length} de $totalVehiculos vehículos' +
-                          (_showOnlyAvailable ? ' (solo disponibles)' : ''),
+                          'Mostrando ${vehiculos.length} de $totalVehiculos vehículos${_showOnlyAvailable ? ' (solo disponibles)' : ''}',
                           style: const TextStyle(fontStyle: FontStyle.italic),
                         ),
                       ),
@@ -101,7 +102,8 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
                       child: ListView.builder(
                         padding: const EdgeInsets.all(8),
                         itemCount: vehiculos.length,
-                        itemBuilder: (context, index) => _buildVehiculoItem(context, vehiculos[index]),
+                        itemBuilder: (context, index) =>
+                            _buildVehiculoItem(context, vehiculos[index]),
                       ),
                     ),
                   ],
@@ -117,7 +119,7 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
       ),
     );
   }
-  
+
   Widget _buildFilterSection() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -129,16 +131,16 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
               prefixIcon: const Icon(Icons.search),
               border: const OutlineInputBorder(),
               contentPadding: const EdgeInsets.symmetric(vertical: 4),
-              suffixIcon: _searchQuery.isNotEmpty 
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      setState(() {
-                        _searchQuery = '';
-                      });
-                    },
-                  )
-                : null,
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        setState(() {
+                          _searchQuery = '';
+                        });
+                      },
+                    )
+                  : null,
             ),
             onChanged: (value) {
               setState(() {
@@ -165,20 +167,19 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
       ),
     );
   }
-  
+
   Widget _buildVehiculoItem(BuildContext context, Vehiculo vehiculo) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: vehiculo.disponible ? Colors.green : Colors.red,
-          child: const Icon(
-            Icons.directions_car,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.directions_car, color: Colors.white),
         ),
         title: Text('${vehiculo.marca} ${vehiculo.modelo}'),
-        subtitle: Text('Año: ${vehiculo.anio} | ${vehiculo.disponible ? "Disponible" : "No disponible"}'),
+        subtitle: Text(
+          'Año: ${vehiculo.anio} | ${vehiculo.disponible ? "Disponible" : "No disponible"}',
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -198,23 +199,26 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
 
   List<Vehiculo> _getFilteredVehiculos(VehiculoProvider provider) {
     var vehiculos = provider.vehiculos;
-    
+
     // Aplicar filtro de disponibilidad
     if (_showOnlyAvailable) {
       vehiculos = vehiculos.where((v) => v.disponible).toList();
     }
-    
+
     // Aplicar filtro de texto
     if (_searchQuery.isEmpty) {
       return vehiculos;
     }
-    
+
     final query = _searchQuery.toLowerCase();
-    return vehiculos.where((v) => 
-      v.marca.toLowerCase().contains(query) || 
-      v.modelo.toLowerCase().contains(query) ||
-      v.anio.toString().contains(query)
-    ).toList();
+    return vehiculos
+        .where(
+          (v) =>
+              v.marca.toLowerCase().contains(query) ||
+              v.modelo.toLowerCase().contains(query) ||
+              v.anio.toString().contains(query),
+        )
+        .toList();
   }
 
   void _navigateToForm(BuildContext context, {Vehiculo? vehiculo}) {
@@ -227,30 +231,34 @@ class _VehiculosListPageState extends State<VehiculosListPage> {
   }
 
   Future<void> _confirmarEliminar(BuildContext context, int idVehiculo) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar'),
-        content: const Text('¿Está seguro que desea eliminar este vehículo?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCELAR'),
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Eliminar'),
+            content: const Text(
+              '¿Está seguro que desea eliminar este vehículo?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('CANCELAR'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('ELIMINAR'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('ELIMINAR'),
-          ),
-        ],
-      ),
-    ) ?? false;
-    
+        ) ??
+        false;
+
     if (confirmed) {
       if (!context.mounted) return;
-      
+
       final provider = Provider.of<VehiculoProvider>(context, listen: false);
       provider.eliminar(idVehiculo);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vehículo eliminado correctamente'),

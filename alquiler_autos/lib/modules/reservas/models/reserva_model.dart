@@ -1,58 +1,103 @@
 /// Modelo de reserva para el sistema de alquiler
 class Reserva {
   final int idReserva;
-  final int idCliente;
-  final int idVehiculo;
+  int idCliente;
+  int idVehiculo;
+  DateTime fechaReserva;
   DateTime fechaInicio;
   DateTime fechaFin;
-  bool activa;
+  String estado; // 'pendiente', 'confirmada', 'cancelada', 'finalizada'
+  double? montoTotal;
+  String? observaciones;
+
+  // Datos relacionados (para mostrar en la UI)
+  String? clienteNombre;
+  String? vehiculoInfo;
 
   Reserva({
     required this.idReserva,
     required this.idCliente,
     required this.idVehiculo,
+    required this.fechaReserva,
     required this.fechaInicio,
     required this.fechaFin,
-    this.activa = true,
+    this.estado = 'pendiente',
+    this.montoTotal,
+    this.observaciones,
+    this.clienteNombre,
+    this.vehiculoInfo,
   });
-  
-  /// Crea una copia de la reserva con valores actualizados
+
   Reserva copyWith({
+    int? idReserva,
+    int? idCliente,
+    int? idVehiculo,
+    DateTime? fechaReserva,
     DateTime? fechaInicio,
     DateTime? fechaFin,
-    bool? activa,
+    String? estado,
+    double? montoTotal,
+    String? observaciones,
+    String? clienteNombre,
+    String? vehiculoInfo,
   }) {
     return Reserva(
-      idReserva: this.idReserva,
-      idCliente: this.idCliente,
-      idVehiculo: this.idVehiculo,
+      idReserva: idReserva ?? this.idReserva,
+      idCliente: idCliente ?? this.idCliente,
+      idVehiculo: idVehiculo ?? this.idVehiculo,
+      fechaReserva: fechaReserva ?? this.fechaReserva,
       fechaInicio: fechaInicio ?? this.fechaInicio,
       fechaFin: fechaFin ?? this.fechaFin,
-      activa: activa ?? this.activa,
+      estado: estado ?? this.estado,
+      montoTotal: montoTotal ?? this.montoTotal,
+      observaciones: observaciones ?? this.observaciones,
+      clienteNombre: clienteNombre ?? this.clienteNombre,
+      vehiculoInfo: vehiculoInfo ?? this.vehiculoInfo,
     );
   }
-  
-  /// Convierte la reserva a un mapa para serialización
+
   Map<String, dynamic> toMap() {
     return {
       'idReserva': idReserva,
       'idCliente': idCliente,
       'idVehiculo': idVehiculo,
-      'fechaInicio': fechaInicio.millisecondsSinceEpoch,
-      'fechaFin': fechaFin.millisecondsSinceEpoch,
-      'activa': activa,
+      'fechaReserva': fechaReserva.toIso8601String(),
+      'fechaInicio': fechaInicio.toIso8601String(),
+      'fechaFin': fechaFin.toIso8601String(),
+      'estado': estado,
+      'montoTotal': montoTotal,
+      'observaciones': observaciones,
+      'clienteNombre': clienteNombre,
+      'vehiculoInfo': vehiculoInfo,
     };
   }
-  
-  /// Crea una reserva desde un mapa (deserialización)
+
   factory Reserva.fromMap(Map<String, dynamic> map) {
     return Reserva(
       idReserva: map['idReserva'],
       idCliente: map['idCliente'],
       idVehiculo: map['idVehiculo'],
-      fechaInicio: DateTime.fromMillisecondsSinceEpoch(map['fechaInicio']),
-      fechaFin: DateTime.fromMillisecondsSinceEpoch(map['fechaFin']),
-      activa: map['activa'],
+      fechaReserva: DateTime.parse(map['fechaReserva']),
+      fechaInicio: DateTime.parse(map['fechaInicio']),
+      fechaFin: DateTime.parse(map['fechaFin']),
+      estado: map['estado'],
+      montoTotal: map['montoTotal']?.toDouble(),
+      observaciones: map['observaciones'],
+      clienteNombre: map['clienteNombre'],
+      vehiculoInfo: map['vehiculoInfo'],
     );
+  }
+
+  int get diasReserva => fechaFin.difference(fechaInicio).inDays;
+
+  bool get estaActiva => estado == 'confirmada' || estado == 'pendiente';
+  bool get estaPendiente => estado == 'pendiente';
+  bool get estaConfirmada => estado == 'confirmada';
+  bool get estaCancelada => estado == 'cancelada';
+  bool get estaFinalizada => estado == 'finalizada';
+
+  @override
+  String toString() {
+    return 'Reserva #$idReserva - Cliente #$idCliente - Vehículo #$idVehiculo';
   }
 }
