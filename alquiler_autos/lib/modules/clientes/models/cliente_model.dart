@@ -19,7 +19,7 @@ class Cliente {
     String? numeroDocumento,
   }) {
     return Cliente(
-      idCliente: this.idCliente,
+      idCliente: idCliente,
       nombre: nombre ?? this.nombre,
       apellido: apellido ?? this.apellido,
       numeroDocumento: numeroDocumento ?? this.numeroDocumento,

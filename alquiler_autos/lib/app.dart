@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 
 // Importar proveedores
 import 'modules/vehiculos/providers/vehiculo_provider.dart';
+import 'modules/reservas/providers/reserva_provider.dart';
 
 // Importar modelos
 import 'modules/vehiculos/models/vehiculo_model.dart';
+import 'modules/reservas/models/reserva_model.dart';
 
 // Importar páginas
 import 'modules/vehiculos/pages/vehiculos_list_page.dart';
@@ -13,6 +15,7 @@ import 'modules/vehiculos/pages/vehiculo_form_page.dart';
 import 'modules/home/pages/home_page.dart';
 import 'modules/clientes/pages/clientes_list_page.dart';
 import 'modules/reservas/pages/reservas_list_page.dart';
+import 'modules/reservas/pages/reserva_form_page.dart';
 import 'modules/entregas/pages/entregas_list_page.dart';
 import 'modules/estadisticas/pages/estadisticas_page.dart';
 
@@ -28,6 +31,7 @@ class App extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => VehiculoProvider()),
+        ChangeNotifierProvider(create: (_) => ReservaProvider()),
         // Aquí se pueden agregar más providers a medida que se desarrollen los otros módulos
       ],
       child: MaterialApp(
@@ -53,6 +57,12 @@ class App extends StatelessWidget {
             final vehiculo = settings.arguments as Vehiculo?;
             return MaterialPageRoute(
               builder: (context) => VehiculoFormPage(vehiculo: vehiculo),
+            );
+          }
+          if (settings.name == AppRoutes.reservaForm) {
+            final reserva = settings.arguments as Reserva?;
+            return MaterialPageRoute(
+              builder: (context) => ReservaFormPage(reserva: reserva),
             );
           }
           return null;
