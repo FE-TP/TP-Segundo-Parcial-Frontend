@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 // Importar proveedores
 import 'modules/vehiculos/providers/vehiculo_provider.dart';
 import 'modules/reservas/providers/reserva_provider.dart';
+import 'modules/entregas/providers/entrega_provider.dart';
 
 // Importar modelos
 import 'modules/vehiculos/models/vehiculo_model.dart';
@@ -32,7 +33,7 @@ class App extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => VehiculoProvider()),
         ChangeNotifierProvider(create: (_) => ReservaProvider()),
-        // Aquí se pueden agregar más providers a medida que se desarrollen los otros módulos
+        ChangeNotifierProvider(create: (_) => EntregaProvider()),
       ],
       child: MaterialApp(
         title: 'Sistema de Alquiler de Autos',
