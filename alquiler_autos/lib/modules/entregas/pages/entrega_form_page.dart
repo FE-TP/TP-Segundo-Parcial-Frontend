@@ -7,7 +7,6 @@ import '../../reservas/models/reserva_model.dart';
 import '../../vehiculos/providers/vehiculo_provider.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/custom_button.dart';
-import '../../../core/utils/date_formatter.dart';
 import '../../../core/theme/app_colors.dart';
 
 class EntregaFormPage extends StatefulWidget {
@@ -130,7 +129,7 @@ class _EntregaFormPageState extends State<EntregaFormPage> {
 
   Widget _buildReservaDropdown(List<Reserva> reservasActivas) {
     return DropdownButtonFormField<int>(
-      value: _selectedReservaId == 0 ? null : _selectedReservaId,
+      initialValue: _selectedReservaId == 0 ? null : _selectedReservaId,
       decoration: const InputDecoration(
         labelText: 'Reserva',
         border: OutlineInputBorder(),

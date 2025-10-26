@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Modelo que representa una entrega de vehículo
 class Entrega {
   /// ID único de la entrega
