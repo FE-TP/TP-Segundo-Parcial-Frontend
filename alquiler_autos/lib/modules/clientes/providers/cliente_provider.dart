@@ -3,47 +3,49 @@ import '../models/cliente_model.dart';
 
 /// Provider que gestiona la lista de clientes
 class ClienteProvider extends ChangeNotifier {
-  // Lista interna de clientes
   final List<Cliente> _clientes = [];
-  
-  // ID autoincrementable para nuevos clientes
   int _nextId = 1;
-  
-  // Constructor
+
   ClienteProvider() {
-    // Aquí se pueden agregar clientes de ejemplo
-    _agregarClientesDePrueba();
+    _sembrarDatos();
   }
-  
-  // Getter para obtener una copia de la lista de clientes
+
   List<Cliente> get clientes => List.unmodifiable(_clientes);
-  
-  // Obtener el siguiente ID disponible
-  int get nextId => _nextId++;
-  
-  /// Agregar un nuevo cliente a la lista
+
+  /// Genera un nuevo identificador incremental
+  int generarId() => _nextId++;
+
+  /// Retorna los clientes ordenados por apellido y nombre
+  List<Cliente> obtenerOrdenados() {
+    final copia = List<Cliente>.from(_clientes);
+    copia.sort(
+      (a, b) => '${a.apellido} ${a.nombre}'.compareTo('${b.apellido} ${b.nombre}'),
+    );
+    return copia;
+  }
+
+  /// Agrega un nuevo cliente
   void agregar(Cliente cliente) {
     _clientes.add(cliente);
     notifyListeners();
   }
-  
-  /// Actualizar un cliente existente
+
+  /// Actualiza un cliente existente
   void actualizar(Cliente cliente) {
     final index = _clientes.indexWhere((c) => c.idCliente == cliente.idCliente);
-    
     if (index != -1) {
       _clientes[index] = cliente;
       notifyListeners();
     }
   }
-  
-  /// Eliminar un cliente por su ID
+
+  /// Elimina un cliente por su identificador
   void eliminar(int id) {
-    _clientes.removeWhere((cliente) => cliente.idCliente == id);
+    _clientes.removeWhere((c) => c.idCliente == id);
     notifyListeners();
   }
-  
-  /// Obtener un cliente por su ID
+
+  /// Obtiene un cliente por su identificador
   Cliente? obtenerPorId(int id) {
     try {
       return _clientes.firstWhere((c) => c.idCliente == id);
@@ -51,54 +53,52 @@ class ClienteProvider extends ChangeNotifier {
       return null;
     }
   }
-  
-  /// Filtrar clientes por nombre y apellido
-  List<Cliente> filtrarPorNombreCompleto(String query) {
-    if (query.isEmpty) return clientes;
-    
-    query = query.toLowerCase();
-    return _clientes.where(
-      (c) => '${c.nombre} ${c.apellido}'.toLowerCase().contains(query)
-    ).toList();
-  }
-  
-  /// Filtrar clientes por número de documento
-  List<Cliente> filtrarPorDocumento(String documento) {
-    if (documento.isEmpty) return clientes;
-    
-    return _clientes.where(
-      (c) => c.numeroDocumento.contains(documento)
-    ).toList();
-  }
-  
-  /// Verificar si un número de documento ya existe
-  bool documentoExiste(String documento, {int? excludeId}) {
-    return _clientes.any((c) => 
-      c.numeroDocumento == documento && (excludeId == null || c.idCliente != excludeId)
+
+  /// Verifica si un documento ya existe dentro de la lista
+  bool documentoExiste(String documento, {int? excluirId}) {
+    return _clientes.any(
+      (c) => c.numeroDocumento == documento && (excluirId == null || c.idCliente != excluirId),
     );
   }
-  
-  /// Método privado para agregar clientes de ejemplo
-  void _agregarClientesDePrueba() {
-    agregar(Cliente(
-      idCliente: nextId,
-      nombre: 'Juan',
-      apellido: 'Pérez',
-      numeroDocumento: '12345678',
-    ));
-    
-    agregar(Cliente(
-      idCliente: nextId,
-      nombre: 'María',
-      apellido: 'González',
-      numeroDocumento: '87654321',
-    ));
-    
-    agregar(Cliente(
-      idCliente: nextId,
-      nombre: 'Carlos',
-      apellido: 'Rodríguez',
-      numeroDocumento: '45678912',
-    ));
+
+  /// Retorna una lista filtrada por nombre y/o documento
+  List<Cliente> filtrar({String nombre = '', String documento = ''}) {
+    final queryNombre = nombre.trim().toLowerCase();
+    final queryDocumento = documento.trim();
+
+    return _clientes.where((cliente) {
+      final coincideNombre = queryNombre.isEmpty
+          ? true
+          : '${cliente.nombre} ${cliente.apellido}'.toLowerCase().contains(queryNombre);
+      final coincideDocumento = queryDocumento.isEmpty
+          ? true
+          : cliente.numeroDocumento.contains(queryDocumento);
+      return coincideNombre && coincideDocumento;
+    }).toList();
+  }
+
+  void _sembrarDatos() {
+    final iniciales = [
+      Cliente(
+        idCliente: generarId(),
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        numeroDocumento: '12345678',
+      ),
+      Cliente(
+        idCliente: generarId(),
+        nombre: 'María',
+        apellido: 'González',
+        numeroDocumento: '87654321',
+      ),
+      Cliente(
+        idCliente: generarId(),
+        nombre: 'Carlos',
+        apellido: 'Rodríguez',
+        numeroDocumento: '45678912',
+      ),
+    ];
+
+    _clientes.addAll(iniciales);
   }
 }

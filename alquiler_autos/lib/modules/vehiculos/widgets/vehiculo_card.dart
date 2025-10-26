@@ -79,8 +79,8 @@ class VehiculoCard extends StatelessWidget {
         ),
       ),
       backgroundColor: vehiculo.disponible 
-          ? AppColors.success.withOpacity(0.1)
-          : AppColors.error.withOpacity(0.1),
+      ? AppColors.success.withValues(alpha: 26)
+      : AppColors.error.withValues(alpha: 26),
       side: BorderSide(
         color: vehiculo.disponible ? AppColors.success : AppColors.error,
         width: 1,

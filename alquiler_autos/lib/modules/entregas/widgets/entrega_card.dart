@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/entrega_model.dart';
-import '../../../core/utils/date_formatter.dart';
 
 /// Widget que muestra la información de una entrega en forma de tarjeta
 class EntregaCard extends StatelessWidget {
