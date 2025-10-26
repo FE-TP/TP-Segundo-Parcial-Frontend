@@ -6,6 +6,7 @@ import 'modules/vehiculos/providers/vehiculo_provider.dart';
 import 'modules/reservas/providers/reserva_provider.dart';
 import 'modules/entregas/providers/entrega_provider.dart';
 import 'modules/clientes/providers/cliente_provider.dart';
+import 'modules/estadisticas/providers/estadisticas_provider.dart';
 
 // Importar modelos
 import 'modules/vehiculos/models/vehiculo_model.dart';
@@ -38,6 +39,21 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ClienteProvider()),
         ChangeNotifierProvider(create: (_) => ReservaProvider()),
         ChangeNotifierProvider(create: (_) => EntregaProvider()),
+        // Provider de estadísticas que depende de otros providers
+        ChangeNotifierProxyProvider3<VehiculoProvider, ReservaProvider, ClienteProvider, EstadisticasProvider>(
+          create: (context) => EstadisticasProvider(
+            vehiculoProvider: context.read<VehiculoProvider>(),
+            reservaProvider: context.read<ReservaProvider>(),
+            clienteProvider: context.read<ClienteProvider>(),
+          ),
+          update: (context, vehiculo, reserva, cliente, previous) =>
+              previous ??
+              EstadisticasProvider(
+                vehiculoProvider: vehiculo,
+                reservaProvider: reserva,
+                clienteProvider: cliente,
+              ),
+        ),
       ],
       child: MaterialApp(
         title: 'Sistema de Alquiler de Autos',
