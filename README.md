@@ -1,18 +1,18 @@
 # TP-Segundo-Parcial-Frontend
 
-## 📋 Descripción del Proyecto
+## Descripción del Proyecto
 
 Aplicación móvil desarrollada en **Flutter** para la gestión integral de un sistema de alquiler de autos. La aplicación funciona completamente en memoria local sin necesidad de backend o API externa, permitiendo administrar vehículos, clientes, reservas, entregas y estadísticas del negocio.
 
-## 👥 Integrantes del Equipo
+## Integrantes del Equipo
 
-- **Fernando Fleitas** - Módulo de Vehículos
-- **José Ramirez** - Módulo de Clientes
-- **Lucas Vargas** - Módulo de Reservas
-- **Atilio Paredes** - Módulo de Entregas
-- **Elias Figueredo** - Módulo de Estadísticas
+- **Fleitas Cáceres, Fernando David**
+- **Figueredo Rosa, Elias Jesus**
+- **Paredes Pérez, Atilio Sebastián**
+- **Ramírez Dure, José Gabriel**
+- **Vargas Florentín, Lucas Jesús Elias** 
 
-## 🚀 Cómo Levantar el Proyecto
+## Cómo Levantar el Proyecto
 
 ### Requisitos Previos
 
@@ -62,5 +62,3 @@ El proyecto está organizado en una arquitectura modular dentro de la carpeta `a
 - **Módulo de Reservas**: Creación y seguimiento de reservas
 - **Módulo de Entregas**: Registro de entregas de vehículos
 - **Módulo de Estadísticas**: Métricas y reportes del negocio
-
-Para más detalles sobre la estructura y convenciones del proyecto, consulta el archivo `alquiler_autos/README.md`.
