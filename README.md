@@ -53,7 +53,7 @@ Aplicación móvil desarrollada en **Flutter** para la gestión integral de un s
    flutter devices
    ```
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 El proyecto está organizado en una arquitectura modular dentro de la carpeta `alquiler_autos/`:
 
