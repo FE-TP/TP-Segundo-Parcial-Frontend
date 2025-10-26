@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/reserva_provider.dart';
 import '../models/reserva_model.dart';
-import '../models/cliente_temp.dart';
 import '../../vehiculos/providers/vehiculo_provider.dart';
+import '../../clientes/providers/cliente_provider.dart';
+import '../../clientes/pages/cliente_form_page.dart';
 import '../../../core/widgets/custom_text_field.dart';
-import '../../../core/widgets/custom_button.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -79,7 +79,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
               // Información contextual
               if (_isEditing)
                 Card(
-                  color: AppColors.info.withOpacity(0.1),
+                  color: AppColors.info.withValues(alpha: 26),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
@@ -150,7 +150,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.1),
+                  color: AppColors.warning.withValues(alpha: 26),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.warning),
                 ),
@@ -173,7 +173,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
 
               // Estado
               DropdownButtonFormField<String>(
-                value: _estado,
+                initialValue: _estado,
                 decoration: const InputDecoration(
                   labelText: 'Estado',
                   border: OutlineInputBorder(),
@@ -246,30 +246,55 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
   }
 
   Widget _buildClienteSelector() {
-    final clientes = ClientesData.clientes;
+    return Consumer<ClienteProvider>(
+      builder: (context, clienteProvider, child) {
+        final clientes = clienteProvider.obtenerOrdenados();
 
-    return DropdownButtonFormField<int>(
-      value: _selectedClienteId,
-      decoration: const InputDecoration(
-        labelText: 'Cliente *',
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.person),
-        hintText: 'Seleccione un cliente',
-      ),
-      isExpanded: true,
-      items: clientes.map((cliente) {
-        return DropdownMenuItem<int>(
-          value: cliente.id,
-          child: Text('${cliente.nombre} - DNI: ${cliente.dni}'),
+        if (clientes.isEmpty) {
+          return _ClienteSelectorVacio(onCreateClient: () async {
+            final resultado = await Navigator.push<ClienteFormResult?>(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ClienteFormPage(),
+              ),
+            );
+            if (!mounted || resultado == null) return;
+            setState(() {});
+          });
+        }
+
+        if (_selectedClienteId != null &&
+            !clientes.any((c) => c.idCliente == _selectedClienteId)) {
+          _selectedClienteId = null;
+        }
+
+        return DropdownButtonFormField<int>(
+          initialValue: _selectedClienteId,
+          decoration: const InputDecoration(
+            labelText: 'Cliente *',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.person),
+            hintText: 'Seleccione un cliente',
+          ),
+          isExpanded: true,
+          items: clientes.map((cliente) {
+            return DropdownMenuItem<int>(
+              value: cliente.idCliente,
+              child: Text(
+                '${cliente.nombre} ${cliente.apellido} - DNI: ${cliente.numeroDocumento}',
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedClienteId = value;
+            });
+          },
+          validator: (value) =>
+              value == null ? 'Debe seleccionar un cliente' : null,
         );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedClienteId = value;
-        });
       },
-      validator: (value) =>
-          value == null ? 'Debe seleccionar un cliente' : null,
     );
   }
 
@@ -298,7 +323,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.error.withOpacity(0.1),
+              color: AppColors.error.withValues(alpha: 26),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.error),
             ),
@@ -321,7 +346,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<int>(
-              value: _selectedVehiculoId,
+              initialValue: _selectedVehiculoId,
               decoration: InputDecoration(
                 labelText: 'Vehículo *',
                 border: const OutlineInputBorder(),
@@ -363,7 +388,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withOpacity(0.1),
+                  color: AppColors.info.withValues(alpha: 26),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.info),
                 ),
@@ -442,7 +467,9 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
       );
 
       // Obtener información del cliente y vehículo
-      final cliente = ClientesData.obtenerPorId(_selectedClienteId!);
+      final cliente = context.read<ClienteProvider>().obtenerPorId(
+            _selectedClienteId!,
+          );
       final vehiculo = vehiculoProvider.vehiculos.firstWhere(
         (v) => v.idVehiculo == _selectedVehiculoId,
       );
@@ -466,7 +493,9 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
         observaciones: _observacionesController.text.isNotEmpty
             ? _observacionesController.text
             : null,
-        clienteNombre: cliente?.nombre,
+    clienteNombre: cliente != null
+      ? '${cliente.nombre} ${cliente.apellido}'
+      : widget.reserva?.clienteNombre,
         vehiculoInfo: vehiculo.toString(),
       );
 
@@ -532,5 +561,49 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
       // Si se confirma o está pendiente, marcar como no disponible
       vehiculoProvider.actualizarDisponibilidad(idVehiculo, false);
     }
+  }
+}
+
+class _ClienteSelectorVacio extends StatelessWidget {
+  final VoidCallback onCreateClient;
+
+  const _ClienteSelectorVacio({required this.onCreateClient});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+  color: AppColors.warning.withValues(alpha: 20),
+        borderRadius: BorderRadius.circular(12),
+  border: Border.all(color: AppColors.warning.withValues(alpha: 51)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.info_outline, color: AppColors.warning),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'No hay clientes registrados. Registra uno para poder continuar con la reserva.',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ElevatedButton.icon(
+              onPressed: onCreateClient,
+              icon: const Icon(Icons.person_add_alt),
+              label: const Text('Registrar cliente'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

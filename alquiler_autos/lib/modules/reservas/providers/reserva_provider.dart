@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import '../models/reserva_model.dart';
-import '../models/cliente_temp.dart';
 
 class ReservaProvider with ChangeNotifier {
   final List<Reserva> _reservas = [
@@ -13,7 +12,7 @@ class ReservaProvider with ChangeNotifier {
       fechaFin: DateTime.now().add(const Duration(days: 5)),
       estado: 'confirmada',
       montoTotal: 25000.0,
-      clienteNombre: ClientesData.obtenerPorId(1)?.nombre,
+      clienteNombre: 'Juan Pérez',
       vehiculoInfo: 'Toyota Corolla 2020',
     ),
     Reserva(
@@ -25,7 +24,7 @@ class ReservaProvider with ChangeNotifier {
       fechaFin: DateTime.now().add(const Duration(days: 7)),
       estado: 'pendiente',
       montoTotal: 18000.0,
-      clienteNombre: ClientesData.obtenerPorId(2)?.nombre,
+      clienteNombre: 'María González',
       vehiculoInfo: 'Honda Civic 2021',
     ),
     Reserva(
@@ -37,7 +36,7 @@ class ReservaProvider with ChangeNotifier {
       fechaFin: DateTime.now().add(const Duration(days: 2)),
       estado: 'confirmada',
       montoTotal: 32000.0,
-      clienteNombre: ClientesData.obtenerPorId(3)?.nombre,
+      clienteNombre: 'Carlos Rodríguez',
       vehiculoInfo: 'Ford Focus 2019',
     ),
   ];

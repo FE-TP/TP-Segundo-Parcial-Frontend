@@ -8,6 +8,8 @@ import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../vehiculos/providers/vehiculo_provider.dart';
+import '../../clientes/providers/cliente_provider.dart';
+import '../../clientes/models/cliente_model.dart';
 
 class ReservasListPage extends StatefulWidget {
   const ReservasListPage({super.key});
@@ -37,10 +39,10 @@ class _ReservasListPageState extends State<ReservasListPage> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: Consumer<ReservaProvider>(
-              builder: (context, provider, child) {
-                final reservas = _getFilteredReservas(provider);
-                final totalReservas = provider.reservas.length;
+            child: Consumer2<ReservaProvider, ClienteProvider>(
+              builder: (context, reservaProvider, clienteProvider, child) {
+                final reservas = _getFilteredReservas(reservaProvider);
+                final totalReservas = reservaProvider.reservas.length;
 
                 if (reservas.isEmpty &&
                     (_searchQuery.isNotEmpty || _filtroEstado != 'todas')) {
@@ -111,7 +113,11 @@ class _ReservasListPageState extends State<ReservasListPage> {
                         padding: const EdgeInsets.all(8),
                         itemCount: reservas.length,
                         itemBuilder: (context, index) =>
-                            _buildReservaItem(context, reservas[index]),
+                            _buildReservaItem(
+                          context,
+                          reservas[index],
+                          clienteProvider.obtenerPorId(reservas[index].idCliente),
+                        ),
                       ),
                     ),
                   ],
@@ -189,18 +195,25 @@ class _ReservasListPageState extends State<ReservasListPage> {
     );
   }
 
-  Widget _buildReservaItem(BuildContext context, Reserva reserva) {
+  Widget _buildReservaItem(
+    BuildContext context,
+    Reserva reserva,
+    Cliente? cliente,
+  ) {
     final estadoColor = _getEstadoColor(reserva.estado);
     final estadoIcon = _getEstadoIcon(reserva.estado);
+    final nombreCliente = cliente != null
+        ? '${cliente.nombre} ${cliente.apellido}'
+        : reserva.clienteNombre ?? 'Cliente #${reserva.idCliente}';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: estadoColor.withOpacity(0.2),
+          backgroundColor: estadoColor.withValues(alpha: 51),
           child: Icon(estadoIcon, color: estadoColor),
         ),
-        title: Text(reserva.clienteNombre ?? 'Cliente #${reserva.idCliente}'),
+        title: Text(nombreCliente),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
